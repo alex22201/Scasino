@@ -1,0 +1,77 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment and dependencies
+/.env
+env/
+venv/
+*env/
+env/
+*.pyenv/
+*.venv/
+.venv/
+ENV/
+env.bak/
+.devenv/
+.nox/
+dist/
+build/
+.tox/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+.hypothesis/
+.pytest_history
+.cache/
+.mypy_cache/
+.pylint.d/
+.pydevproject
+
+# IDE related
+.idea/
+*.suo
+*.sln
+*.swp
+*.swo
+*.pkl
+*.pidb
+*.sdf
+*.idb
+
+# PyCharm
+.idea/
+
+# Jupyter notebook
+*.ipynb_checkpoints/
+
+# Data files
+*.sqlite3
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Django specific
+*.log
+*.pot
+*.mo
+*.swp
+*.swo
+*.pyo
+*.pyd
+*.sql
+
+# Mac specific
+.DS_Store
+.Trashes/
+.fseventsd/
+.dbfse/
+com.apple.timemachine.donotpresent
+icon*
+.DS_Store?
+/data/
