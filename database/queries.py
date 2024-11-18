@@ -1,9 +1,16 @@
+import logging
+
 from database.models import Session, User
+
+logger = logging.getLogger(__name__)
 
 
 def get_user_by_username(username: str) -> User:
     with Session() as session:
-        user = session.query(User).filter_by(username=username).first()
+        try:
+            user = session.query(User).filter_by(username=username).first()
+        except Exception as e:
+            logger.error(e)
     return user
 
 
@@ -12,6 +19,8 @@ def create_user(username: str, telegram_id: int) -> User:
         new_user = User(username=username, telegram_user_id=telegram_id)
         session.add(new_user)
         session.commit()
+        session.refresh(new_user)
+
     return new_user
 
 

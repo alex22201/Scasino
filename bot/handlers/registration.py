@@ -1,6 +1,6 @@
 import sqlite3
 
-from telegram import Update
+from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from bot.keyboards import KeyboardTemplates
@@ -111,8 +111,19 @@ async def ask_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     update_user_phone_number(update.effective_user.id, contact.phone_number)
 
-    await update.message.reply_text(
-        RegistrationMessages.get_registration_completed_message(
+    message = await update.message.reply_text(
+        text='Loading...',
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+    await context.bot.delete_message(
+        chat_id=update.effective_chat.id,
+        message_id=message.message_id
+    )
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=RegistrationMessages.get_registration_completed_message(
             update.effective_user.username),
         reply_markup=KeyboardTemplates.main_menu_keyboard(),
     )
