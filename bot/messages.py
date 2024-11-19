@@ -1,5 +1,11 @@
+from database.models import User
+from database.queries import get_users_by_balance_and_rank
+
+
 class RegistrationMessages:
-    SHARE_NUMBER_MESSAGE = 'Now please share your phone number so that we can contact you.'
+    SHARE_NUMBER_MESSAGE = (
+        'Now please share your phone number so that we can contact you.'
+    )
     PLEASE_ENTER_CORRECT_AGE = 'Please enter the correct age.'
     REGISTRATION_COMPLETED = 'Registration is complete! Welcome, {username}! 🎉\nSelect an action from the menu below:'
     SHARE_PHONE_BUTTON_MESSAGE = 'Please press the button to share your phone number.'
@@ -11,8 +17,10 @@ class RegistrationMessages:
 
     @staticmethod
     def get_registration_message(username: str) -> str:
-        return f'Welcome to S-Casino, {username}! 🎰\nYou have been registered with a starting balance of 100💰.\n' \
-               'Please tell me, how old are you?'
+        return (
+            f'Welcome to S-Casino, {username}! 🎰\nYou have been registered with a starting balance of 100💰.\n'
+            'Please tell me, how old are you?'
+        )
 
     @staticmethod
     def get_registration_completed_message(username: str) -> str:
@@ -30,3 +38,46 @@ class MenuMessages:
     CABINET_SELECTED: str = '👤 This is your Cabinet.'
     RATING_SELECTED: str = '📈 Player Ranking.'
     DAILY_BONUS_SELECTED: str = '🎁 Claim your daily bonus!'
+
+    @staticmethod
+    def get_cabinet_message(user: User) -> str:
+        text = (
+            f'📋 *Your Cabinet*\n\n'
+            f'👤 *Username:* {user.username}\n'
+            f"📅 *Registration Date:* {user.registration_date.strftime('%d %B %Y %H:%M:%S')}\n"
+            f'💰 *Balance:* {user.balance}\n'
+        )
+        return text
+
+    @staticmethod
+    def generate_balance_ranking_text(telegram_id: int) -> str:
+        """
+        Generate a beautifully formatted text showing the top-10 users by balance
+        and the current user's rank.
+        :param telegram_id: Telegram ID of the current user.
+        :return: Generated text.
+        """
+        top_users, rank = get_users_by_balance_and_rank(telegram_id)
+
+        # Header
+        text = '🏆 *Leaderboard: Top-10 Users by Balance* 🏆\n\n'
+        text += '🔝 *Top 10 Users:*\n'
+
+        # Add top-10 users
+        for index, user in enumerate(top_users, start=1):
+            text += f'{index}. 👤 *{user.username}* — 💰 `{user.balance} $`\n'
+
+        # Add user rank
+        if rank:
+            text += '\n🎖 *Your Position:*\n'
+            if rank > 10:
+                text += f'📊 You are ranked *{rank}* in the leaderboard!\n'
+            else:
+                text += f'🌟 You are in the *Top-10*, ranked *{rank}*!\n'
+        else:
+            text += '\n⚠️ *User not found in the database.*\n'
+
+        # Footer
+        text += '\n💡 *Keep trading to improve your rank!*'
+
+        return text

@@ -16,6 +16,7 @@ class User(Base):
     username = Column(String, unique=True)
     balance = Column(Integer, default=100)
     last_check_in = Column(DateTime, default=datetime.utcnow)
+    registration_date = Column(DateTime, default=datetime.utcnow)
     phone_number = Column(String, unique=True)
     age = Column(Integer)
 

@@ -4,7 +4,7 @@ from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from bot.keyboards import KeyboardTemplates
-from bot.messages import ErrorMessages, MenuMessages, RegistrationMessages
+from bot.messages import ErrorMessages, RegistrationMessages
 from bot.utils import validate_age
 from database.queries import (create_user, get_user_by_username,
                               update_user_age, update_user_phone_number)
@@ -38,14 +38,15 @@ async def handle_existing_user(update: Update, existing_user):
     if not existing_user.phone_number:
         await update.message.reply_text(
             text=RegistrationMessages.SHARE_NUMBER_MESSAGE,
-            reply_markup=KeyboardTemplates.get_phone_share_keyboard()
+            reply_markup=KeyboardTemplates.get_phone_share_keyboard(),
         )
         return CONTACT
 
     await update.message.reply_text(
         text=RegistrationMessages.get_welcome_message(
-            existing_user.username, existing_user.balance),
-        reply_markup=KeyboardTemplates.main_menu_keyboard()
+            existing_user.username, existing_user.balance
+        ),
+        reply_markup=KeyboardTemplates.main_menu_keyboard(),
     )
     return ConversationHandler.END
 
@@ -98,7 +99,7 @@ async def ask_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         text=RegistrationMessages.SHARE_NUMBER_MESSAGE,
-        reply_markup=KeyboardTemplates.get_phone_share_keyboard()
+        reply_markup=KeyboardTemplates.get_phone_share_keyboard(),
     )
     return CONTACT
 
@@ -117,30 +118,14 @@ async def ask_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await context.bot.delete_message(
-        chat_id=update.effective_chat.id,
-        message_id=message.message_id
+        chat_id=update.effective_chat.id, message_id=message.message_id
     )
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=RegistrationMessages.get_registration_completed_message(
-            update.effective_user.username),
+            update.effective_user.username
+        ),
         reply_markup=KeyboardTemplates.main_menu_keyboard(),
     )
     return ConversationHandler.END
-
-
-async def handle_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    menu_messages = {
-        'games': MenuMessages.GAMES_SELECTED,
-        'cabinet': MenuMessages.CABINET_SELECTED,
-        'rating': MenuMessages.RATING_SELECTED,
-        'daily_bonus': MenuMessages.DAILY_BONUS_SELECTED,
-    }
-
-    message = menu_messages.get(query.data, 'Invalid option')
-
-    await query.edit_message_text(message)

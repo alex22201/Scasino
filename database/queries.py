@@ -46,3 +46,27 @@ def update_user_phone_number(telegram_id: int, phone_number: str) -> User | None
             session.refresh(user)
             return user
         return None
+
+
+def get_users_by_balance_and_rank(
+    telegram_id: int, limit: int = 10
+) -> tuple[list[User], int | None]:
+    with Session() as session:
+        try:
+            users = session.query(User).order_by(User.balance.desc()).all()
+
+            user_index = next(
+                (
+                    index
+                    for index, user in enumerate(users)
+                    if user.telegram_user_id == telegram_id
+                ),
+                None,
+            )
+            rank = user_index + 1 if user_index is not None else None
+
+            top_users = users[:limit]
+            return top_users, rank
+        except Exception as e:
+            logger.error(e)
+            return [], None

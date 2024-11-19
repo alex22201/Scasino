@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0  # Обновленная версия
+    rev: v3.4.0  #
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -17,15 +17,13 @@ repos:
     -   id: check-xml
 
 
-# Для сортировки импортов
 -   repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.10.0  # Также используйте последнюю стабильную версию
+    rev: v5.10.0
     hooks:
     -   id: isort
         name: isort (python import sorter)
 
-# Для автоформатирования по PEP-8 (если хотите использовать autopep8)
--   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.6.0  # Актуальная версия autopep8
+-   repo: https://github.com/hhatto/autopep8
+    rev: v2.3.1
     hooks:
     -   id: autopep8

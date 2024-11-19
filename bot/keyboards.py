@@ -24,5 +24,13 @@ class KeyboardTemplates:
     def get_phone_share_keyboard() -> ReplyKeyboardMarkup:
         contact_button = KeyboardButton('Share number 📞', request_contact=True)
         contact_keyboard = ReplyKeyboardMarkup(
-            [[contact_button]], resize_keyboard=True, one_time_keyboard=True)
+            [[contact_button]], resize_keyboard=True, one_time_keyboard=True
+        )
         return contact_keyboard
+
+    @staticmethod
+    def get_cabinet_keyboard() -> InlineKeyboardMarkup:
+        keyboard = [
+            [InlineKeyboardButton('Back to Menu', callback_data='main_menu')],
+        ]
+        return InlineKeyboardMarkup(keyboard)
