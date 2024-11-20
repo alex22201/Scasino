@@ -1,6 +1,3 @@
-from gettext import textdomain
-from imghdr import tests
-
 from bot.utils import convert_time_delta
 from database.models import User
 from database.queries import get_users_by_balance_and_rank
@@ -17,12 +14,12 @@ class RegistrationMessages:
 
     @staticmethod
     def get_welcome_message(username: str, balance: int) -> str:
-        return f'Welcome back, {username}! 🎰\nBalance: {balance}💰'
+        return f'Welcome back, {username}! 🎰\nBalance: {balance} S💰'
 
     @staticmethod
     def get_registration_message(username: str) -> str:
         return (
-            f'Welcome to S-Casino, {username}! 🎰\nYou have been registered with a starting balance of 100💰.\n'
+            f'Welcome to S-Casino, {username}! 🎰\nYou have been registered with a starting balance of 100 S💰.\n'
             'Please tell me, how old are you?'
         )
 
@@ -49,7 +46,7 @@ class MenuMessages:
             f'📋 *Your Cabinet*\n\n'
             f'👤 *Username:* {user.username}\n'
             f"📅 *Registration Date:* {user.registration_date.strftime('%d %B %Y %H:%M:%S')}\n"
-            f'💰 *Balance:* {user.balance}\n'
+            f'💰 *Balance:* {user.balance} S\n'
         )
         return text
 
@@ -69,7 +66,7 @@ class MenuMessages:
 
         # Add top-10 users
         for index, user in enumerate(top_users, start=1):
-            text += f'{index}. 👤 *{user.username}* — 💰 `{user.balance} $`\n'
+            text += f'{index}. 👤 *{user.username}* — 💰 `{user.balance} S`\n'
 
         # Add user rank
         if rank:
@@ -104,3 +101,26 @@ class BonusMessages:
         text = (f'Your new balance: {balance}.\n '
                 f'Come back for the next bonus tomorrow!')
         return text
+
+
+class CoinFlipMessages:
+    """Class to store Coin Flip game messages."""
+    WELCOME_MESSAGE = (
+        "🎮 Welcome to the 'Coin Flip' game!\n\n"
+        'Your current balance: {balance} S\nPlease enter your bet amount:'
+    )
+    INSUFFICIENT_BALANCE = "❌ You don't have enough funds for this bet."
+    INVALID_BET = '❗ Please enter a valid bet (a number greater than zero).'
+    GAME_NOT_FOUND = '❗ Please start a new game.'
+    BET_ACCEPTED = 'Your bet: {bet}. Choose the side of the coin:'
+    WIN_MESSAGE = (
+        '🎉 You won! The coin shows {side}.\n'
+        'Your winnings: {winnings}!\nCurrent balance: {balance}'
+    )
+    LOSS_MESSAGE = (
+        '😞 You lost. The coin shows {side}.\n'
+        'Current balance: {balance} S'
+    )
+    USER_NOT_FOUND = '❌ User not found. Please try again.'
+    COIN_FLIPPING = 'The coin is flipping... 🌀'
+    NO_GAME_IN_PROGRESS = '❗ Please start a new game.'

@@ -51,3 +51,25 @@ class KeyboardTemplates:
         return InlineKeyboardMarkup([
             [InlineKeyboardButton('🔙 Back to Menu', callback_data='main_menu')]
         ])
+
+    @staticmethod
+    def coin_flip_choice_keyboard() -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    '🪙 Heads', callback_data='coin_flip_heads'),
+                InlineKeyboardButton(
+                    '🪙 Tails', callback_data='coin_flip_tails'),
+            ],
+            [InlineKeyboardButton(
+                '🔙 Back to Menu', callback_data='main_menu')],
+        ])
+
+    @staticmethod
+    def coin_flip_result_keyboard() -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                '🔄 Play Again', callback_data='coin_flip_start')],
+            [InlineKeyboardButton(
+                '🔙 Back to Menu', callback_data='main_menu')],
+        ])
