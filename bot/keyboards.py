@@ -34,3 +34,20 @@ class KeyboardTemplates:
             [InlineKeyboardButton('Back to Menu', callback_data='main_menu')],
         ]
         return InlineKeyboardMarkup(keyboard)
+
+    @staticmethod
+    def get_bonus_keyboard(bonus_available: bool = False) -> InlineKeyboardMarkup:
+        keyboard_buttons = []
+        if bonus_available:
+            keyboard_buttons.append([InlineKeyboardButton(
+                '🎁 Claim', callback_data='claim_bonus')])
+        keyboard_buttons.append([InlineKeyboardButton(
+            '🔙 Back to Menu', callback_data='main_menu')])
+        keyboard = InlineKeyboardMarkup(keyboard_buttons)
+        return keyboard
+
+    @staticmethod
+    def get_claim_bonus_keyboard() -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton('🔙 Back to Menu', callback_data='main_menu')]
+        ])

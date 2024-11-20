@@ -1,3 +1,7 @@
+from gettext import textdomain
+from imghdr import tests
+
+from bot.utils import convert_time_delta
 from database.models import User
 from database.queries import get_users_by_balance_and_rank
 
@@ -80,4 +84,23 @@ class MenuMessages:
         # Footer
         text += '\n💡 *Keep trading to improve your rank!*'
 
+        return text
+
+
+class BonusMessages:
+    CLAIM_BONUS_MESSAGE = '🎉 Bonus successfully claimed!'
+    CLAIM_BONUS_UNAVAILABLE_MESSAGE = '⏳ Bonus is not yet available!'
+
+    @staticmethod
+    def get_bonus_available_message(time=None) -> str:
+        if time:
+            bonus_status = f'⏳ Bonus will be available in {convert_time_delta(time)}.'
+        else:
+            bonus_status = '✅ Bonus is available!'
+        return f'*Bonus Status:*\n{bonus_status}'
+
+    @staticmethod
+    def get_successful_claimed_bonus_message(balance: int) -> str:
+        text = (f'Your new balance: {balance}.\n '
+                f'Come back for the next bonus tomorrow!')
         return text

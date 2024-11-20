@@ -1,7 +1,7 @@
 from telegram.ext import (Application, CallbackQueryHandler, CommandHandler,
                           ConversationHandler, MessageHandler, filters)
 
-from bot.handlers.bonuses import handle_bonuses
+from bot.handlers.bonuses import claim_bonus, handle_bonuses
 from bot.handlers.cabinet import handle_cabinet
 from bot.handlers.games import handle_games
 from bot.handlers.menu import back_to_main_menu
@@ -31,6 +31,7 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_rating, pattern='^rating$'))
     app.add_handler(CallbackQueryHandler(
         handle_bonuses, pattern='^daily_bonus$'))
+    app.add_handler(CallbackQueryHandler(claim_bonus, pattern='^claim_bonus$'))
 
     print('Bot is running...')
     app.run_polling()
