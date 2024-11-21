@@ -10,7 +10,7 @@ from bot.handlers.games.abstract import AbstractGame
 from bot.keyboards import KeyboardTemplates
 from bot.messages import DiceGameMessages
 from bot.services import GameService
-from config import DICE_GIT_URL
+from config import DICE_GIF_URL
 from database.models import Session
 from database.models import User
 
@@ -18,7 +18,7 @@ from database.models import User
 class DiceGame(AbstractGame):
     """Class for the 'Dice Game'."""
 
-    gif_url: str = DICE_GIT_URL
+    gif_url: str = DICE_GIF_URL
 
     @classmethod
     async def start(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

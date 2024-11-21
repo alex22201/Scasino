@@ -1,8 +1,8 @@
-from datetime import time, timedelta
+from datetime import timedelta
 
 
 def validate_age(age: str) -> int | None:
-    if not age.isdigit():
+    if not age.isdigit() or int(age) > 100:
         return None
     return int(age)
 

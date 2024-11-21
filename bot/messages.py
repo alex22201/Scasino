@@ -53,7 +53,7 @@ class MenuMessages:
         return text
 
     @staticmethod
-    def generate_balance_ranking_text(top_users: list[User], rank: Any[int | None]) -> str:
+    def generate_balance_ranking_text(top_users: list[User], rank: Any) -> str:
         # Header
         text = '🏆 *Leaderboard: Top-10 Users by Balance* 🏆\n\n'
         text += '🔝 *Top 10 Users:*\n'

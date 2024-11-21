@@ -5,7 +5,7 @@ from bot.handlers.games.abstract import AbstractGame
 
 class GameService:
     """Service to manage game states for users."""
-    active_games: dict[int, dict[str, Any[AbstractGame | str | int]]] = {}
+    active_games: dict[int, dict[str, Any]] = {}
 
     @classmethod
     def start_game(cls, telegram_user_id: int, game: type[AbstractGame]) -> None:

@@ -27,7 +27,7 @@ class User(Base):  # type: ignore
     age = Column(Integer)
     last_bonus_claim = Column(DateTime, nullable=True)
 
-    def can_claim_bonus(self) -> Any[bool]:
+    def can_claim_bonus(self) -> Any:
         BONUS_COOLDOWN = timedelta(days=1)
         if self.last_bonus_claim:
             return datetime.utcnow() - self.last_bonus_claim >= BONUS_COOLDOWN

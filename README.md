@@ -43,7 +43,7 @@ Before running the bot, make sure you have the following:
     TELEGRAM_API_TOKEN=your_telegram_bot_token
     TIME_BONUS_AMOUNT=1000
     COIN_FLIP_GIF_URL=https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHEwZHh5ZzFjZzlkZGc1YWR4ZGkycnNoa3J3MmZjb3M3aG9xNzdjciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Y4cMaANkENnOxDEPe6/giphy.gif
-    DICE_GIT_URL=https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3BrcWd2OWI0djU3bWo2cHhnNjVjbGFscHBoZW8zbGZkb2RwNmh5biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H8emGexVWRACH5X08H/giphy.gif
+    DICE_GIF_URL=https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3BrcWd2OWI0djU3bWo2cHhnNjVjbGFscHBoZW8zbGZkb2RwNmh5biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H8emGexVWRACH5X08H/giphy.gif
     ```
 
 2. **Database Configuration:**

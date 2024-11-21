@@ -1,18 +1,23 @@
 import sqlite3
+from typing import Any
 
-from telegram import ReplyKeyboardRemove, Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram import Update
+from telegram.ext import ContextTypes
+from telegram.ext import ConversationHandler
 
 from bot.keyboards import KeyboardTemplates
-from bot.messages import ErrorMessages, RegistrationMessages
+from bot.messages import ErrorMessages
+from bot.messages import RegistrationMessages
 from bot.utils import validate_age
-from database.queries import (create_user, get_user_by_username,
-                              update_user_age, update_user_phone_number)
+from database.models import User
+from database.queries import create_user
+from database.queries import get_user_by_username
+from database.queries import update_user_age
 
 AGE, CONTACT = range(2)
 
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
     user = update.effective_user
     try:
         existing_user = get_user_by_username(user.username)
@@ -22,36 +27,30 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return await handle_new_user(update, user)
 
-    except (ValueError, sqlite3.DatabaseError) as e:
+    except (ValueError, sqlite3.DatabaseError):
         await update.message.reply_text(ErrorMessages.REGISTRATION_ERROR_MESSAGE)
 
 
-async def handle_existing_user(update: Update, existing_user):
+async def handle_existing_user(update: Update, existing_user: User) -> Any:
     """Handles existing users' registration process."""
     if not existing_user.age:
         await update.message.reply_text(
             text=RegistrationMessages.get_registration_message(
-                existing_user.username),
+                existing_user.username,
+            ),
         )
         return AGE
 
-    if not existing_user.phone_number:
-        await update.message.reply_text(
-            text=RegistrationMessages.SHARE_NUMBER_MESSAGE,
-            reply_markup=KeyboardTemplates.get_phone_share_keyboard(),
-        )
-        return CONTACT
-
     await update.message.reply_text(
         text=RegistrationMessages.get_welcome_message(
-            existing_user.username, existing_user.balance
+            existing_user.username, existing_user.balance,
         ),
         reply_markup=KeyboardTemplates.main_menu_keyboard(),
     )
     return ConversationHandler.END
 
 
-async def handle_new_user(update: Update, user):
+async def handle_new_user(update: Update, user: User) -> Any:
     """Handles new user registration process."""
     try:
         new_user = create_user(user.username, user.id)
@@ -78,12 +77,12 @@ async def update_user_age_in_db(update: Update, user_id: int, age: int) -> bool:
             await update.message.reply_text(ErrorMessages.AGE_SAVE_ERROR)
             return False
         return True
-    except (ValueError, sqlite3.DatabaseError) as e:
+    except (ValueError, sqlite3.DatabaseError):
         await update.message.reply_text(ErrorMessages.AGE_SAVE_ERROR)
         return False
 
 
-async def ask_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def ask_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
     age = update.message.text
     validated_age = validate_age(age)
 
@@ -97,34 +96,10 @@ async def ask_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await update_user_age_in_db(update, update.effective_user.id, validated_age):
         return AGE
 
-    await update.message.reply_text(
-        text=RegistrationMessages.SHARE_NUMBER_MESSAGE,
-        reply_markup=KeyboardTemplates.get_phone_share_keyboard(),
-    )
-    return CONTACT
-
-
-async def ask_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    contact = update.message.contact
-    if not contact:
-        await update.message.reply_text(RegistrationMessages.SHARE_NUMBER_MESSAGE)
-        return CONTACT
-
-    update_user_phone_number(update.effective_user.id, contact.phone_number)
-
-    message = await update.message.reply_text(
-        text='Loading...',
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
-    await context.bot.delete_message(
-        chat_id=update.effective_chat.id, message_id=message.message_id
-    )
-
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=RegistrationMessages.get_registration_completed_message(
-            update.effective_user.username
+            update.effective_user.username,
         ),
         reply_markup=KeyboardTemplates.main_menu_keyboard(),
     )
