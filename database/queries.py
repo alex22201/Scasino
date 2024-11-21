@@ -1,11 +1,13 @@
 import logging
+from typing import Any
 
-from database.models import Session, User
+from database.models import Session
+from database.models import User
 
 logger = logging.getLogger(__name__)
 
 
-def get_user_by_username(username: str) -> User:
+def get_user_by_username(username: str) -> Any[User]:
     with Session() as session:
         try:
             user = session.query(User).filter_by(username=username).first()
@@ -24,10 +26,11 @@ def create_user(username: str, telegram_id: int) -> User:
     return new_user
 
 
-def update_user_age(telegram_id: int, age: int) -> User | None:
+def update_user_age(telegram_id: int, age: int) -> Any[User | None]:
     with Session() as session:
         user = session.query(User).filter_by(
-            telegram_user_id=telegram_id).first()
+            telegram_user_id=telegram_id,
+        ).first()
         if user:
             user.age = age
             session.commit()
@@ -36,10 +39,11 @@ def update_user_age(telegram_id: int, age: int) -> User | None:
         return None
 
 
-def update_user_phone_number(telegram_id: int, phone_number: str) -> User | None:
+def update_user_phone_number(telegram_id: int, phone_number: str) -> Any[User | None]:
     with Session() as session:
         user = session.query(User).filter_by(
-            telegram_user_id=telegram_id).first()
+            telegram_user_id=telegram_id,
+        ).first()
         if user:
             user.phone_number = phone_number
             session.commit()
@@ -49,7 +53,7 @@ def update_user_phone_number(telegram_id: int, phone_number: str) -> User | None
 
 
 def get_users_by_balance_and_rank(
-        telegram_id: int, limit: int = 10
+        telegram_id: int, limit: int = 10,
 ) -> tuple[list[User], int | None]:
     with Session() as session:
         try:

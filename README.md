@@ -10,7 +10,7 @@ Welcome to **S-Casino**! This is a fun and interactive bot where you can play si
 
 Before running the bot, make sure you have the following:
 
-- Python 3.8+
+- Python 3.10+
 - Docker (if running in a containerized environment)
 - Docker Compose (for managing multi-container Docker applications)
 
@@ -41,6 +41,9 @@ Before running the bot, make sure you have the following:
 
     ```env
     TELEGRAM_API_TOKEN=your_telegram_bot_token
+    TIME_BONUS_AMOUNT=1000
+    COIN_FLIP_GIF_URL=https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHEwZHh5ZzFjZzlkZGc1YWR4ZGkycnNoa3J3MmZjb3M3aG9xNzdjciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Y4cMaANkENnOxDEPe6/giphy.gif
+    DICE_GIT_URL=https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3BrcWd2OWI0djU3bWo2cHhnNjVjbGFscHBoZW8zbGZkb2RwNmh5biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H8emGexVWRACH5X08H/giphy.gif
     ```
 
 2. **Database Configuration:**
@@ -77,4 +80,31 @@ To start the bot using Docker Compose, follow these steps:
 
     ```bash
     docker-compose down
+    ```![img.png](img.png)
+
+If you prefer to run the bot directly without Docker, follow these steps:
+
+1. **Install Python Dependencies:**
+
+    Ensure you have Python 3.8+ installed. Create a virtual environment and install the required dependencies:
+
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # For Linux/Mac
+    venv\Scripts\activate  # For Windows
+    pip3 install -r requirements.txt
     ```
+
+2. **Run the Bot:**
+
+    Start the bot with the following command:
+
+    ```bash
+    python run.py
+    ```
+
+3. **Stop the Bot:**
+
+    Press `Ctrl+C` in the terminal to stop the bot.
+
+---

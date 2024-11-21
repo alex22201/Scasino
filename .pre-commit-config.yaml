@@ -1,29 +1,41 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0  #
+    rev: v4.1.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
+    -   id: check-docstring-first
+    -   id: check-json
     -   id: check-yaml
     -   id: check-added-large-files
-    -   id: check-merge-conflict
-    -   id: check-ast
-    -   id: double-quote-string-fixer
     -   id: debug-statements
-    -   id: check-toml
-    -   id: check-json
-    -   id: check-xml
-
-
--   repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.10.0
+    -   id: double-quote-string-fixer
+    -   id: requirements-txt-fixer
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
     hooks:
-    -   id: isort
-        name: isort (python import sorter)
-
+    -   id: flake8
+        additional_dependencies: [flake8-typing-imports==1.12.0]
 -   repo: https://github.com/hhatto/autopep8
-    rev: v2.3.1
+    rev: v2.1.1
     hooks:
     -   id: autopep8
+-   repo: https://github.com/asottile/reorder-python-imports
+    rev: v3.12.0
+    hooks:
+    -   id: reorder-python-imports
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.0
+    hooks:
+    -   id: pyupgrade
+        args: [--py38-plus]
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+    -   id: add-trailing-comma
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+    -   id: mypy
+        additional_dependencies: [types-redis, types-requests]
+        args: [--strict, --ignore-missing-imports]

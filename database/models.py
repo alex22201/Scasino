@@ -1,14 +1,21 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Column
+from sqlalchemy import create_engine
+from sqlalchemy import DateTime
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from config import DATABASE_URL
 
 Base = declarative_base()
 
 
-class User(Base):
+class User(Base):  # type: ignore
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -20,13 +27,13 @@ class User(Base):
     age = Column(Integer)
     last_bonus_claim = Column(DateTime, nullable=True)
 
-    def can_claim_bonus(self):
+    def can_claim_bonus(self) -> Any[bool]:
         BONUS_COOLDOWN = timedelta(days=1)
         if self.last_bonus_claim:
             return datetime.utcnow() - self.last_bonus_claim >= BONUS_COOLDOWN
         return True
 
-    def claim_bonus(self, bonus_amount: int = 100):
+    def claim_bonus(self, bonus_amount: int = 100) -> bool:
         if self.can_claim_bonus():
             self.balance += bonus_amount
             self.last_bonus_claim = datetime.utcnow()

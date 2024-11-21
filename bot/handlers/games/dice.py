@@ -1,15 +1,18 @@
 import asyncio
 import random
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton
+from telegram import InlineKeyboardMarkup
+from telegram import Update
 from telegram.ext import ContextTypes
 
-from bot.games_service import GameService
 from bot.handlers.games.abstract import AbstractGame
 from bot.keyboards import KeyboardTemplates
 from bot.messages import DiceGameMessages
+from bot.services import GameService
 from config import DICE_GIT_URL
-from database.models import Session, User
+from database.models import Session
+from database.models import User
 
 
 class DiceGame(AbstractGame):
@@ -17,14 +20,15 @@ class DiceGame(AbstractGame):
 
     gif_url: str = DICE_GIT_URL
 
-    @staticmethod
-    async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    @classmethod
+    async def start(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Start the game and check the player's balance."""
         chat_id = update.effective_chat.id
 
         with Session() as session:
             user = session.query(User).filter_by(
-                telegram_user_id=chat_id).first()
+                telegram_user_id=chat_id,
+            ).first()
             if not user or user.balance <= 0:
                 await context.bot.send_message(
                     chat_id=chat_id,
@@ -40,8 +44,8 @@ class DiceGame(AbstractGame):
         )
         GameService.start_game(user.telegram_user_id, DiceGame)
 
-    @staticmethod
-    async def set_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    @classmethod
+    async def set_bet(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Allow the player to place a bet."""
         chat_id = update.effective_chat.id
 
@@ -58,7 +62,8 @@ class DiceGame(AbstractGame):
 
         with Session() as session:
             user = session.query(User).filter_by(
-                telegram_user_id=chat_id).first()
+                telegram_user_id=chat_id,
+            ).first()
             if not user or user.balance < bet:
                 await context.bot.send_message(
                     chat_id=chat_id,
@@ -69,8 +74,11 @@ class DiceGame(AbstractGame):
         GameService.set_bet(update.effective_user.id, bet)
 
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(
-                str(i), callback_data=f'dice_choice_{i}') for i in range(1, 7)]
+            [
+                InlineKeyboardButton(
+                    str(i), callback_data=f'dice_choice_{i}',
+                ) for i in range(1, 7)
+            ],
         ])
         await context.bot.send_message(
             chat_id=chat_id,
@@ -79,7 +87,7 @@ class DiceGame(AbstractGame):
         )
 
     @staticmethod
-    async def choose_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def choose_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle the player's choice of a dice number."""
         query = update.callback_query
         choice = int(query.data.split('_')[-1])
@@ -91,7 +99,7 @@ class DiceGame(AbstractGame):
         )
 
     @classmethod
-    async def roll_dice(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def roll_dice(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle the dice roll and calculate the result."""
         query = update.callback_query
         chat_id = query.message.chat_id
@@ -106,7 +114,8 @@ class DiceGame(AbstractGame):
 
         with Session() as session:
             user = session.query(User).filter_by(
-                telegram_user_id=chat_id).first()
+                telegram_user_id=chat_id,
+            ).first()
             if not user:
                 await query.edit_message_text(text=DiceGameMessages.USER_NOT_FOUND)
                 return

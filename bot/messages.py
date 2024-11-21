@@ -1,3 +1,7 @@
+from datetime import timedelta
+from typing import Any
+from typing import Optional
+
 from bot.utils import convert_time_delta
 from database.models import User
 
@@ -49,7 +53,7 @@ class MenuMessages:
         return text
 
     @staticmethod
-    def generate_balance_ranking_text(top_users: list, rank: int) -> str:
+    def generate_balance_ranking_text(top_users: list[User], rank: Any[int | None]) -> str:
         # Header
         text = '🏆 *Leaderboard: Top-10 Users by Balance* 🏆\n\n'
         text += '🔝 *Top 10 Users:*\n'
@@ -69,7 +73,7 @@ class MenuMessages:
             text += '\n⚠️ *User not found in the database.*\n'
 
         # Footer
-        text += '\n💡 *Keep trading to improve your rank!*'
+        text += '\n💡 *Keep gambling to improve your rank!*'
 
         return text
 
@@ -79,7 +83,7 @@ class BonusMessages:
     CLAIM_BONUS_UNAVAILABLE_MESSAGE = '⏳ Bonus is not yet available!'
 
     @staticmethod
-    def get_bonus_available_message(time=None) -> str:
+    def get_bonus_available_message(time: Optional[timedelta] = None) -> str:
         if time:
             bonus_status = f'⏳ Bonus will be available in {convert_time_delta(time)}.'
         else:
@@ -88,8 +92,10 @@ class BonusMessages:
 
     @staticmethod
     def get_successful_claimed_bonus_message(balance: int) -> str:
-        text = (f'Your new balance: {balance}.\n '
-                f'Come back for the next bonus tomorrow!')
+        text = (
+            f'Your new balance: {balance}.\n '
+            f'Come back for the next bonus tomorrow!'
+        )
         return text
 
 
@@ -149,8 +155,14 @@ class DiceGameMessages:
 
     @staticmethod
     def win_message(dice_result: int, choice: int, winnings: float, balance: float) -> str:
-        return f'🎉 Congratulations! The dice rolled {dice_result}, and you guessed {choice}. You won {winnings}! Your new balance: {balance}.'
+        return (
+            f'🎉 Congratulations! The dice rolled {dice_result}, and you guessed {choice}. '
+            f'You won {winnings}! Your new balance: {balance}.'
+        )
 
     @staticmethod
     def loss_message(dice_result: int, choice: int, bet: float, balance: float) -> str:
-        return f'😢 The dice rolled {dice_result}, but you guessed {choice}. You lost {bet}. Your new balance: {balance}.'
+        return (
+            f'😢 The dice rolled {dice_result}, but you guessed {choice}. '
+            f'You lost {bet}. Your new balance: {balance}.'
+        )

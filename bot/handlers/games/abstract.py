@@ -1,16 +1,19 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
+
+from telegram import Update
+from telegram.ext import ContextTypes
 
 
 class AbstractGame(ABC):
     """Abstract base class for games."""
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    async def start(*args, **kwargs):
-        """Start the game and return a welcome message."""
+    async def start(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    async def set_bet(*args, **kwargs):
+    async def set_bet(cls, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         pass
