@@ -4,23 +4,23 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from bot.games_service import GameService
+from bot.handlers.games.abstract import AbstractGame
 from bot.keyboards import KeyboardTemplates
 from bot.messages import CoinFlipMessages
+from config import COIN_FLIP_GIF_URL
 from database.models import Session, User
 from database.queries import get_user_by_username
 
 
-class CoinFlipGame:
-    """Класс игры 'Coin Flip'."""
-
-    active_games = {}
+class CoinFlipGame(AbstractGame):
+    gif_url: str = COIN_FLIP_GIF_URL
 
     @staticmethod
-    async def start_game(update, context):
+    async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Start the game: check user balance and request a bet amount."""
         chat_id = update.effective_chat.id
-        username = update.effective_user.username or f'User{chat_id}'
-
+        username = update.effective_user.username
         user: User = get_user_by_username(username=username)
         balance = user.balance
 
@@ -33,21 +33,13 @@ class CoinFlipGame:
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=CoinFlipMessages.WELCOME_MESSAGE.format(balance=balance),
+            text=CoinFlipMessages.welcome_message(balance=balance),
         )
-        CoinFlipGame.active_games[chat_id] = {'state': 'awaiting_bet'}
+        GameService.start_game(user.telegram_user_id, CoinFlipGame)
 
     @staticmethod
     async def set_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Set the bet and allow the user to choose a side."""
         chat_id = update.effective_chat.id
-        if chat_id not in CoinFlipGame.active_games or CoinFlipGame.active_games[chat_id].get(
-                'state') != 'awaiting_bet':
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=CoinFlipMessages.GAME_NOT_FOUND,
-            )
-            return
 
         try:
             bet = int(update.message.text)
@@ -60,6 +52,43 @@ class CoinFlipGame:
             )
             return
 
+        if not await CoinFlipGame.check_balance(chat_id, bet, update, context):
+            return
+
+        GameService.set_bet(update.effective_user.id, bet)
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=CoinFlipMessages.bet_accepted(bet=bet),
+            reply_markup=KeyboardTemplates.coin_flip_choice_keyboard(),
+        )
+
+    @classmethod
+    async def flip_coin(cls, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle user's choice and perform the coin flip."""
+        query = update.callback_query
+        chat_id = query.message.chat_id
+
+        bet = GameService.get_bet(update.effective_user.id)
+
+        user_choice = query.data.split('_')[-1]
+        coin_result = random.choice(['heads', 'tails'])
+
+        # Send GIF for the coin flip
+        message = await query.message.reply_animation(cls.gif_url)
+        await asyncio.sleep(3)
+        await message.delete()
+
+        # Process the coin flip result and update user balance
+        result_text = await CoinFlipGame.process_flip_result(chat_id, user_choice, coin_result, bet)
+
+        keyboard = KeyboardTemplates.coin_flip_result_keyboard()
+        GameService.pop_game(update.effective_user.id)
+        await query.edit_message_text(text=result_text, reply_markup=keyboard)
+
+    @staticmethod
+    async def check_balance(chat_id, bet, update, context):
+        """Check if the user has enough balance to place the bet."""
         with Session() as session:
             user = session.query(User).filter_by(
                 telegram_user_id=chat_id).first()
@@ -68,49 +97,24 @@ class CoinFlipGame:
                     chat_id=chat_id,
                     text=CoinFlipMessages.INSUFFICIENT_BALANCE,
                 )
-                return
-
-        CoinFlipGame.active_games[chat_id] = {
-            'state': 'awaiting_choice', 'bet': bet}
-        keyboard = KeyboardTemplates.coin_flip_choice_keyboard()
-
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text=CoinFlipMessages.BET_ACCEPTED.format(bet=bet),
-            reply_markup=keyboard,
-        )
+                return False
+        return True
 
     @staticmethod
-    async def flip_coin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle user's choice and perform the coin flip."""
-        query = update.callback_query
-        chat_id = query.message.chat_id
-
-        if chat_id not in CoinFlipGame.active_games or CoinFlipGame.active_games[chat_id].get(
-                'state') != 'awaiting_choice':
-            await query.answer(CoinFlipMessages.NO_GAME_IN_PROGRESS, show_alert=True)
-            return
-
-        user_choice = query.data.split('_')[-1]
-        bet = CoinFlipGame.active_games[chat_id]['bet']
-        coin_result = random.choice(['heads', 'tails'])
-
-        await query.answer(CoinFlipMessages.COIN_FLIPPING)
-        await asyncio.sleep(2)
-
+    async def process_flip_result(chat_id, user_choice, coin_result, bet):
+        """Process the coin flip result and update the user's balance."""
         with Session() as session:
             user = session.query(User).filter_by(
                 telegram_user_id=chat_id).first()
             if not user:
-                await query.edit_message_text(text=CoinFlipMessages.USER_NOT_FOUND)
-                return
+                return CoinFlipMessages.USER_NOT_FOUND
 
             if coin_result == user_choice:
                 winnings = bet * 2
                 user.balance += winnings
                 session.commit()
                 session.refresh(user)
-                result_text = CoinFlipMessages.WIN_MESSAGE.format(
+                return CoinFlipMessages.win_message(
                     side='Heads' if coin_result == 'heads' else 'Tails',
                     winnings=winnings,
                     balance=user.balance,
@@ -119,12 +123,7 @@ class CoinFlipGame:
                 user.balance -= bet
                 session.commit()
                 session.refresh(user)
-                result_text = CoinFlipMessages.LOSS_MESSAGE.format(
+                return CoinFlipMessages.loss_message(
                     side='Heads' if coin_result == 'heads' else 'Tails',
                     balance=user.balance,
                 )
-
-        keyboard = KeyboardTemplates.coin_flip_result_keyboard()
-        CoinFlipGame.active_games.pop(chat_id, None)
-
-        await query.edit_message_text(text=result_text, reply_markup=keyboard)

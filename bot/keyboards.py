@@ -62,7 +62,7 @@ class KeyboardTemplates:
                     '🪙 Tails', callback_data='coin_flip_tails'),
             ],
             [InlineKeyboardButton(
-                '🔙 Back to Menu', callback_data='main_menu')],
+                '🔙 Back to Game Menu', callback_data='games')],
         ])
 
     @staticmethod
@@ -71,5 +71,38 @@ class KeyboardTemplates:
             [InlineKeyboardButton(
                 '🔄 Play Again', callback_data='coin_flip_start')],
             [InlineKeyboardButton(
-                '🔙 Back to Menu', callback_data='main_menu')],
+                '🔙 Back to Game Menu', callback_data='games')],
         ])
+
+    @staticmethod
+    def dice_number_keyboard():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                str(i), callback_data=f'dice_choice_{i}') for i in range(1, 7)]
+        ])
+
+    @staticmethod
+    def dice_roll_keyboard():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton('🎲 Roll the Dice!',
+                                  callback_data='dice_roll')]
+        ])
+
+    @staticmethod
+    def dice_result_keyboard():
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton('🔄 Play Again', callback_data='dice_start')],
+            [InlineKeyboardButton('🔙 Back to Game Menu',
+                                  callback_data='games')],
+        ])
+
+    @staticmethod
+    def get_games_keyboard() -> InlineKeyboardMarkup:
+        reply_markup = InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                '🎮 Coin Flip', callback_data='coin_flip_start')],
+            [InlineKeyboardButton('🎲 Dice Game', callback_data='dice_start')],
+            [InlineKeyboardButton('🔙 Back to menu',
+                                  callback_data='main_menu')],
+        ])
+        return reply_markup

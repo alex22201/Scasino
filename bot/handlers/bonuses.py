@@ -47,7 +47,7 @@ async def claim_bonus(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if bonus_available:
             user_details.balance += TIME_BONUS_AMOUNT
             user_details.last_bonus_claim = datetime.utcnow()
-            session.commit()  # Save changes to the database
+            session.commit()
 
             await query.answer(BonusMessages.CLAIM_BONUS_MESSAGE)
             await query.edit_message_text(

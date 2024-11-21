@@ -1,16 +1,12 @@
 from bot.utils import convert_time_delta
 from database.models import User
-from database.queries import get_users_by_balance_and_rank
 
 
 class RegistrationMessages:
-    SHARE_NUMBER_MESSAGE = (
-        'Now please share your phone number so that we can contact you.'
-    )
-    PLEASE_ENTER_CORRECT_AGE = 'Please enter the correct age.'
-    REGISTRATION_COMPLETED = 'Registration is complete! Welcome, {username}! 🎉\nSelect an action from the menu below:'
-    SHARE_PHONE_BUTTON_MESSAGE = 'Please press the button to share your phone number.'
-    UNDERAGE_MESSAGE = 'You are too young to play! 😜 Go study some more math! 📚'
+    SHARE_NUMBER_MESSAGE: str = 'Now please share your phone number so that we can contact you.'
+    PLEASE_ENTER_CORRECT_AGE: str = 'Please enter the correct age.'
+    SHARE_PHONE_BUTTON_MESSAGE: str = 'Please press the button to share your phone number.'
+    UNDERAGE_MESSAGE: str = 'You are too young to play! 😜 Go study some more math! 📚'
 
     @staticmethod
     def get_welcome_message(username: str, balance: int) -> str:
@@ -25,7 +21,7 @@ class RegistrationMessages:
 
     @staticmethod
     def get_registration_completed_message(username: str) -> str:
-        return RegistrationMessages.REGISTRATION_COMPLETED.format(username=username)
+        return f'Registration is complete! Welcome, {username}! 🎉\nSelect an action from the menu below:'
 
 
 class ErrorMessages:
@@ -39,6 +35,8 @@ class MenuMessages:
     CABINET_SELECTED: str = '👤 This is your Cabinet.'
     RATING_SELECTED: str = '📈 Player Ranking.'
     DAILY_BONUS_SELECTED: str = '🎁 Claim your daily bonus!'
+    CHOOSE_GAME: str = '🎮 Choose a game to play:'
+    MAIN_MENU: str = '📋 Main Menu\nChoose an option:'
 
     @staticmethod
     def get_cabinet_message(user: User) -> str:
@@ -51,15 +49,7 @@ class MenuMessages:
         return text
 
     @staticmethod
-    def generate_balance_ranking_text(telegram_id: int) -> str:
-        """
-        Generate a beautifully formatted text showing the top-10 users by balance
-        and the current user's rank.
-        :param telegram_id: Telegram ID of the current user.
-        :return: Generated text.
-        """
-        top_users, rank = get_users_by_balance_and_rank(telegram_id)
-
+    def generate_balance_ranking_text(top_users: list, rank: int) -> str:
         # Header
         text = '🏆 *Leaderboard: Top-10 Users by Balance* 🏆\n\n'
         text += '🔝 *Top 10 Users:*\n'
@@ -105,22 +95,62 @@ class BonusMessages:
 
 class CoinFlipMessages:
     """Class to store Coin Flip game messages."""
-    WELCOME_MESSAGE = (
-        "🎮 Welcome to the 'Coin Flip' game!\n\n"
-        'Your current balance: {balance} S\nPlease enter your bet amount:'
-    )
     INSUFFICIENT_BALANCE = "❌ You don't have enough funds for this bet."
     INVALID_BET = '❗ Please enter a valid bet (a number greater than zero).'
     GAME_NOT_FOUND = '❗ Please start a new game.'
-    BET_ACCEPTED = 'Your bet: {bet}. Choose the side of the coin:'
-    WIN_MESSAGE = (
-        '🎉 You won! The coin shows {side}.\n'
-        'Your winnings: {winnings}!\nCurrent balance: {balance}'
-    )
-    LOSS_MESSAGE = (
-        '😞 You lost. The coin shows {side}.\n'
-        'Current balance: {balance} S'
-    )
     USER_NOT_FOUND = '❌ User not found. Please try again.'
     COIN_FLIPPING = 'The coin is flipping... 🌀'
     NO_GAME_IN_PROGRESS = '❗ Please start a new game.'
+
+    @staticmethod
+    def welcome_message(balance: float) -> str:
+        return (
+            f"🎮 Welcome to the 'Coin Flip' game!\n\n"
+            f'Your current balance: {balance} S\nPlease enter your bet amount:'
+        )
+
+    @staticmethod
+    def bet_accepted(bet: float) -> str:
+        return f'Your bet: {bet}. Choose the side of the coin:'
+
+    @staticmethod
+    def win_message(side: str, winnings: float, balance: float) -> str:
+        return (
+            f'🎉 You won! The coin shows {side}.\n'
+            f'Your winnings: {winnings}!\nCurrent balance: {balance}'
+        )
+
+    @staticmethod
+    def loss_message(side: str, balance: float) -> str:
+        return (
+            f'😞 You lost. The coin shows {side}.\n'
+            f'Current balance: {balance} S'
+        )
+
+
+class DiceGameMessages:
+    GAME_NOT_FOUND = 'No active game found. Start a new game first.'
+    INVALID_BET = 'Invalid bet amount. Please enter a positive number.'
+    INSUFFICIENT_BALANCE = "You don't have enough balance to play."
+    INSUFFICIENT_FUNDS = "You don't have enough balance for this bet."
+    USER_NOT_FOUND = 'User not found in the database.'
+
+    @staticmethod
+    def welcome_message(balance: float) -> str:
+        return f'🎲 Welcome to the Dice Game! Your current balance: {balance}. Place your bet:'
+
+    @staticmethod
+    def bet_accepted(bet: float) -> str:
+        return f'Your bet of {bet} has been accepted. Choose a number (1-6):'
+
+    @staticmethod
+    def number_chosen(choice: int) -> str:
+        return f'You chose the number {choice}. Now roll the dice!'
+
+    @staticmethod
+    def win_message(dice_result: int, choice: int, winnings: float, balance: float) -> str:
+        return f'🎉 Congratulations! The dice rolled {dice_result}, and you guessed {choice}. You won {winnings}! Your new balance: {balance}.'
+
+    @staticmethod
+    def loss_message(dice_result: int, choice: int, bet: float, balance: float) -> str:
+        return f'😢 The dice rolled {dice_result}, but you guessed {choice}. You lost {bet}. Your new balance: {balance}.'

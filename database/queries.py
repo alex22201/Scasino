@@ -49,7 +49,7 @@ def update_user_phone_number(telegram_id: int, phone_number: str) -> User | None
 
 
 def get_users_by_balance_and_rank(
-    telegram_id: int, limit: int = 10
+        telegram_id: int, limit: int = 10
 ) -> tuple[list[User], int | None]:
     with Session() as session:
         try:
