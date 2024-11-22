@@ -2,6 +2,7 @@ import asyncio
 import random
 
 from telegram import Update
+from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 
 from bot.handlers.games.abstract import AbstractGame
@@ -75,10 +76,13 @@ class CoinFlipGame(AbstractGame):
         user_choice = query.data.split('_')[-1]
         coin_result = random.choice(['heads', 'tails'])
 
-        # Send GIF for the coin flip
-        message = await query.message.reply_animation(cls.gif_url)
-        await asyncio.sleep(3)
-        await message.delete()
+        try:
+            message = await query.message.reply_animation(cls.gif_url)
+            await asyncio.sleep(3)
+            await message.delete()
+        except BadRequest:
+            await query.answer('The coin is being flipped... Please wait!', show_alert=False)
+            await asyncio.sleep(2)
 
         # Process the coin flip result and update user balance
         result_text = await CoinFlipGame.process_flip_result(chat_id, user_choice, coin_result, bet)

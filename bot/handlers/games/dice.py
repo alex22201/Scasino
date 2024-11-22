@@ -4,6 +4,7 @@ import random
 from telegram import InlineKeyboardButton
 from telegram import InlineKeyboardMarkup
 from telegram import Update
+from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 
 from bot.handlers.games.abstract import AbstractGame
@@ -108,9 +109,13 @@ class DiceGame(AbstractGame):
         player_choice = GameService.get_choice(update.effective_user.id)
         dice_result = random.randint(1, 6)
 
-        message = await query.message.reply_animation(cls.gif_url)
-        await asyncio.sleep(3)
-        await message.delete()
+        try:
+            message = await query.message.reply_animation(cls.gif_url)
+            await asyncio.sleep(3)
+            await message.delete()
+        except BadRequest:
+            await query.answer('The dice is being rolled... Please wait!', show_alert=False)
+            await asyncio.sleep(2)
 
         with Session() as session:
             user = session.query(User).filter_by(
